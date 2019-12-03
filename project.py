@@ -6,6 +6,13 @@ import numpy as np
 from itertools import product
 from skimage import io,color
 
+# Need for NN
+import tensorflow as tf
+from tensorflow import keras
+from keras.utils import *
+from keras.layers import *
+from keras.models import *
+from keras.callbacks import *
 
 #Binary tree data structure & Huffman Encoder
 #http://www.techrepublic.com/article/huffman-coding-in-python/
@@ -117,7 +124,29 @@ for i in range(borderSize, new_n-borderSize):
         pixelValue = window[borderSize, borderSize] 
         trainingLabels.append(pixelValue)
 
-        
 print(window.shape)
 print(n*m)
 print(count)
+
+# Start building the model
+
+input = Input((60,), name='input')
+
+hidden = Dense(32, activation='relu', name='hidden_1')(input)
+dropout = Dropout(0.2, name='dropout_1')(hidden)
+hidden = Dense(16, activation='relu', name='hidden_2')(dropout)
+dropout = Dropout(0.2, name='dropout_2')(hidden)
+hidden = Dense(8, activation='relu', name='hidden_3')(dropout)
+dropout = Dropout(0.2, name='dropout_3')(hidden)
+hidden = Dense(4, activation='relu', name='hidden_4')(dropout)
+dropout = Dropout(0.2, name='dropout_4')(hidden)
+hidden = Dense(2, activation='relu', name='hidden_5')(dropout)
+dropout = Dropout(0.2, name='dropout_5')(hidden)
+
+output = Dense(1, activation='softmax', name='output')(dropout)
+
+model = Model(input=[input], output=[output])
+model.compile(optimizer='rmsprop', loss='mse', metrics=['accuracy'])
+#model = load_model('1.h5')
+#accuracy = model.fit(x_train, y_train, callbacks=[ModelCheckpoint('1.h5', save_best_only=True, verbose=1)], batch_size=64, epochs=2048, verbose=2, validation_data=(x_dev, y_dev))
+#history = model.fit(x_train, y_train, epochs=50, batch_size=32)
